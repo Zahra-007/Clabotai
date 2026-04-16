@@ -267,7 +267,7 @@ export function Sidebar({
   }
 
   return (
-    <div className="flex flex-col h-full py-4 px-3 overflow-hidden" style={{ background: 'var(--color-bg-sidebar)' }}>
+    <div className="flex flex-col h-full py-4 px-3 overflow-hidden" style={{ background: 'transparent' }}>
 
       {/* Brand + Collapse */}
       <div className="flex items-center justify-between px-2 mb-5">

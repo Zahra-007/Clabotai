@@ -90,6 +90,15 @@ export function ChatWindow({ messages, isLoading }: ChatWindowProps) {
             >
               {getGreeting()}, what's on your mind?
             </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.1 }}
+              className="mt-4 text-[15px] text-center"
+              style={{ color: 'var(--color-text-muted)' }}
+            >
+              Ask anything, attach a file, or upload an image 👇
+            </motion.p>
           </div>
 
         ) : (
@@ -112,20 +121,22 @@ export function ChatWindow({ messages, isLoading }: ChatWindowProps) {
                   <div className="flex-1 border-t" style={{ borderColor: 'var(--color-border)' }} />
                 </div>
 
-                <AnimatePresence>
-                  {group.messages.map(msg => (
-                    <MessageBubble
-                      key={msg.idx}
-                      role={msg.role}
-                      content={msg.content}
-                      timestamp={msg.timestamp}
-                      isLoading={isLoading && msg.idx === messages.length - 1}
-                      formatTime={formatTime}
-                      imagePreview={msg.imagePreview}
-                      fileName={msg.fileName}
-                    />
-                  ))}
-                </AnimatePresence>
+                <div className="flex flex-col gap-4">
+                  <AnimatePresence>
+                    {group.messages.map(msg => (
+                      <MessageBubble
+                        key={msg.idx}
+                        role={msg.role}
+                        content={msg.content}
+                        timestamp={msg.timestamp}
+                        isLoading={isLoading && msg.idx === messages.length - 1}
+                        formatTime={formatTime}
+                        imagePreview={msg.imagePreview}
+                        fileName={msg.fileName}
+                      />
+                    ))}
+                  </AnimatePresence>
+                </div>
               </div>
             ))}
 

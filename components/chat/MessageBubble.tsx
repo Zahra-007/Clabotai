@@ -53,10 +53,10 @@ export function MessageBubble({
   if (!isAssistant) {
     return (
       <motion.div
-        initial={{ opacity: 0, y: 6 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ type: 'spring', damping: 26, stiffness: 160 }}
-        className="flex flex-col items-end py-2"
+        transition={{ duration: 0.2, ease: "easeOut" }}
+        className="flex flex-col w-full items-end py-2"
       >
         {/* Image preview — click to open fullscreen lightbox */}
         {imagePreview && (
@@ -111,10 +111,9 @@ export function MessageBubble({
         {/* Text bubble — only show if there's actual text */}
         {content && (
           <div
-            className="max-w-[72%] px-4 py-2.5 rounded-2xl text-[14px] leading-[1.65] select-text"
+            className="w-fit max-w-[70%] px-4 py-3 rounded-2xl shadow-sm text-[14px] leading-[1.65] select-text text-white"
             style={{
-              background: '#ebebeb',
-              color: 'var(--color-text-primary)',
+              background: 'var(--color-brand)',
               fontFamily: 'var(--font-sans)',
             }}
           >
@@ -134,13 +133,13 @@ export function MessageBubble({
   // ── Assistant bubble ──
   return (
     <motion.div
-      initial={{ opacity: 0, y: 6 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ type: 'spring', damping: 26, stiffness: 160 }}
-      className="group/bubble py-2"
+      transition={{ duration: 0.2, ease: "easeOut" }}
+      className="group/bubble flex flex-col w-full items-start py-2"
     >
       <div
-        className="text-[14px] leading-[1.75] select-text"
+        className="w-full max-w-[70%] text-[14px] leading-relaxed select-text"
         style={{
           color: 'var(--color-text-primary)',
           fontFamily: 'var(--font-sans)',
@@ -244,7 +243,7 @@ function MarkdownContent({ content }: { content: string }) {
     }
 
     // Normal paragraph
-    elements.push(<p key={key} className="leading-[1.75]">{renderInline(line)}</p>)
+    elements.push(<p key={key} className="leading-relaxed whitespace-pre-wrap">{renderInline(line)}</p>)
   })
 
   flushList('final')

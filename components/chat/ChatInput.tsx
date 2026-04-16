@@ -218,11 +218,11 @@ export function ChatInput({ onSendMessage, isLoading }: ChatInputProps) {
       {/* Input box */}
       <div
         className={cn(
-          'relative w-full rounded-2xl border transition-all duration-200',
+          'relative w-full rounded-2xl border transition-all duration-200 focus-within:ring-2 focus-within:ring-[var(--color-brand)]/50 backdrop-blur-md',
           isRecording ? 'border-red-200' : 'border-transparent'
         )}
         style={{
-          background: 'var(--color-bg-surface)',
+          background: 'rgba(255, 255, 255, 0.75)',
           boxShadow: '0 1px 8px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.05)',
         }}
       >
@@ -295,7 +295,7 @@ export function ChatInput({ onSendMessage, isLoading }: ChatInputProps) {
             <button
               ref={plusBtnRef}
               onClick={() => setShowAttachMenu(v => !v)}
-              className="w-8 h-8 flex items-center justify-center rounded-full border transition-colors hover:bg-black/5"
+              className="w-8 h-8 flex items-center justify-center rounded-full border transition-all duration-150 hover:bg-black/5 hover:scale-105 active:scale-95"
               style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-secondary)' }}
               title="Attach"
             >
@@ -327,8 +327,8 @@ export function ChatInput({ onSendMessage, isLoading }: ChatInputProps) {
                 onClick={() => isRecording ? stopRecording() : startRecording()}
                 title={isRecording ? 'Stop recording' : 'Voice input'}
                 className={cn(
-                  'w-8 h-8 flex items-center justify-center rounded-full transition-all',
-                  isRecording ? 'bg-red-100 text-red-500' : 'hover:bg-black/5'
+                  'w-8 h-8 flex items-center justify-center rounded-full transition-all duration-150 hover:scale-105 active:scale-95',
+                  isRecording ? 'bg-red-100 text-red-500 shadow-[0_0_10px_rgba(239,68,68,0.3)] animate-pulse' : 'hover:bg-black/5'
                 )}
                 style={!isRecording ? { color: 'var(--color-text-muted)' } : {}}
               >
@@ -339,7 +339,7 @@ export function ChatInput({ onSendMessage, isLoading }: ChatInputProps) {
             <button
               onClick={handleSend}
               disabled={!hasContent || isLoading || isRecording}
-              className="w-8 h-8 flex items-center justify-center rounded-full transition-all"
+              className="w-8 h-8 flex items-center justify-center rounded-full transition-all duration-150 hover:scale-105 active:scale-95"
               style={{
                 background: hasContent && !isLoading && !isRecording ? 'var(--color-brand)' : 'var(--color-border)',
                 color: hasContent && !isLoading && !isRecording ? 'white' : 'var(--color-text-muted)',

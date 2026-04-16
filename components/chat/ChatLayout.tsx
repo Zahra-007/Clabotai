@@ -1,11 +1,11 @@
 'use client'
 
+import Image from 'next/image'
 import React, { useState } from 'react'
 import { Sidebar } from './Sidebar'
 import { motion, AnimatePresence } from 'framer-motion'
-import { SquarePen, PanelLeft, MessageSquare, Menu } from 'lucide-react'
+import { SquarePen, PanelLeft, Menu } from 'lucide-react'
 import { ClaIcon } from '@/components/ui/ClaIcon'
-
 interface Chat {
   id: string
   title: string
@@ -67,8 +67,8 @@ export function ChatLayout({
             animate={{ x: 0 }}
             exit={{ x: -280 }}
             transition={{ type: 'spring', damping: 30, stiffness: 280 }}
-            className="fixed top-0 left-0 h-full z-50 md:hidden overflow-hidden"
-            style={{ width: 260, background: 'var(--color-bg-sidebar)' }}
+            className="fixed top-0 left-0 h-full z-50 md:hidden overflow-hidden backdrop-blur-md bg-white/60 dark:bg-black/60 supports-[backdrop-filter]:bg-opacity-60"
+            style={{ width: 260, background: 'rgba(245, 244, 242, 0.85)' }}
           >
             <Sidebar
               chats={chats}
@@ -87,10 +87,10 @@ export function ChatLayout({
       {/* ── DESKTOP: Collapsed icon rail ── */}
       {!isSidebarOpen && (
         <div
-          className="h-full hidden md:flex flex-col items-center py-5 shrink-0 border-r"
+          className="h-full hidden md:flex flex-col items-center py-5 shrink-0 border-r backdrop-blur-md relative z-10"
           style={{
             width: 56,
-            background: 'var(--color-bg-sidebar)',
+            background: 'rgba(245, 244, 242, 0.85)',
             borderColor: 'var(--color-border)',
             gap: 2,
           }}
@@ -120,21 +120,20 @@ export function ChatLayout({
             <div className="my-3 w-5 border-t" style={{ borderColor: 'var(--color-border)' }} />
           )}
 
-          {/* Recent chats — icon only, tooltip on hover */}
-          {chats.slice(0, 6).map(chat => (
-            <button
-              key={chat.id}
-              onClick={() => onChatSelect(chat.id)}
-              className="w-9 h-9 flex items-center justify-center rounded-xl transition-all hover:bg-black/6"
-              style={{
-                color: activeChatId === chat.id ? 'var(--color-brand)' : 'var(--color-text-muted)',
-                background: activeChatId === chat.id ? 'rgba(99,102,241,0.08)' : 'transparent',
-              }}
-              title={chat.title}
-            >
-              <MessageSquare size={15} />
-            </button>
-          ))}
+          <button
+            onClick={() => setIsSidebarOpen(true)}
+            className="w-9 h-9 flex items-center justify-center rounded-xl transition-all duration-200 hover:bg-black/5 active:scale-95"
+            title="Chats"
+          >
+            <Image
+              src="/chat.png"
+              alt="Chats"
+              width={18}
+              height={18}
+              className="opacity-60 hover:opacity-100 transition-opacity"
+            />
+          </button>
+
 
           {/* Logo at bottom */}
           <div className="mt-auto">
@@ -153,10 +152,16 @@ export function ChatLayout({
             animate={{ width: 240, opacity: 1 }}
             exit={{ width: 0, opacity: 0 }}
             transition={{ type: 'spring', damping: 28, stiffness: 240 }}
-            className="h-full shrink-0 overflow-hidden border-r hidden md:block"
-            style={{ background: 'var(--color-bg-sidebar)', borderColor: 'var(--color-border)' }}
+            className="h-full shrink-0 overflow-hidden border-r hidden md:block backdrop-blur-md relative z-10"
+            style={{ background: 'rgba(245, 244, 242, 0.85)', borderColor: 'var(--color-border)' }}
           >
-            <div className="w-[240px] h-full">
+            <motion.div
+              initial={{ x: -20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: -20, opacity: 0 }}
+              transition={{ duration: 0.2, delay: 0.05 }}
+              className="w-[240px] h-full"
+            >
               <Sidebar
                 chats={chats}
                 activeChatId={activeChatId}
@@ -167,7 +172,7 @@ export function ChatLayout({
                 isSidebarOpen={isSidebarOpen}
                 setIsSidebarOpen={setIsSidebarOpen}
               />
-            </div>
+            </motion.div>
           </motion.aside>
         )}
       </AnimatePresence>
@@ -177,8 +182,8 @@ export function ChatLayout({
 
         {/* Mobile-only top bar */}
         <div
-          className="flex md:hidden items-center justify-between px-4 py-3 border-b shrink-0"
-          style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg-sidebar)' }}
+          className="flex md:hidden items-center justify-between px-4 py-3 border-b shrink-0 backdrop-blur-md z-10"
+          style={{ borderColor: 'var(--color-border)', background: 'rgba(245, 244, 242, 0.85)' }}
         >
           <button
             onClick={() => setIsMobileMenuOpen(true)}
