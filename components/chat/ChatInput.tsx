@@ -161,7 +161,7 @@ export function ChatInput({ onSendMessage, isLoading }: ChatInputProps) {
   const hasContent = !!(input.trim() || selectedImage || selectedFile)
 
   return (
-    <div className="w-full max-w-2xl mx-auto px-4 pb-5">
+    <div className="w-full max-w-[680px] mx-auto px-4 pb-5">
 
       {/* Image / file previews */}
       <AnimatePresence>

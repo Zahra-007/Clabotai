@@ -75,12 +75,13 @@ export function ChatWindow({ messages, isLoading }: ChatWindowProps) {
   const groups = groupMessagesByDate(messages)
 
   return (
-    <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
-      <div className="flex-1 overflow-y-auto chat-scrollbar">
+    <div className="flex-1 overflow-y-auto chat-scrollbar">
+      <div className="w-full">
+
         {messages.length === 0 ? (
 
           /* Welcome */
-          <div className="flex flex-col items-center justify-center h-full pb-8">
+          <div className="flex flex-col items-center justify-center min-h-[70vh] text-center">
             <motion.h1
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
@@ -104,8 +105,8 @@ export function ChatWindow({ messages, isLoading }: ChatWindowProps) {
         ) : (
 
           /* Messages with date separators */
-          <div className="flex flex-col w-full max-w-2xl mx-auto px-4 md:px-6">
-            <div className="h-4 shrink-0" />
+          <div className="flex flex-col w-full max-w-[720px] mx-auto px-4">
+            <div className="h-6 shrink-0" />
 
             {groups.map(group => (
               <div key={group.dateLabel}>
