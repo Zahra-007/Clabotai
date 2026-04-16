@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+export const runtime = 'nodejs'
+
 export async function POST(req: NextRequest) {
     try {
         const { base64 } = await req.json()
@@ -12,8 +14,9 @@ export async function POST(req: NextRequest) {
         const raw = base64.replace(/^data:application\/pdf;base64,/, '')
         const buffer = Buffer.from(raw, 'base64')
 
-        // Dynamic import to avoid SSR issues
-        const pdfParse = (await import('pdf-parse')).default
+        // Dynamic import to avoid SSR issues — handle both export patterns
+        const pdfModule = await import('pdf-parse') as any
+        const pdfParse = pdfModule.default || pdfModule
         const data = await pdfParse(buffer)
 
         return NextResponse.json({

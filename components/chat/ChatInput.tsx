@@ -17,8 +17,8 @@ interface ChatInputProps {
 
 declare global {
   interface Window {
-    SpeechRecognition: typeof SpeechRecognition
-    webkitSpeechRecognition: typeof SpeechRecognition
+    SpeechRecognition: any
+    webkitSpeechRecognition: any
   }
 }
 
@@ -33,7 +33,7 @@ export function ChatInput({ onSendMessage, isLoading }: ChatInputProps) {
   const [showAttachMenu, setShowAttachMenu] = useState(false)
 
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const recognitionRef = useRef<SpeechRecognition | null>(null)
+  const recognitionRef = useRef<any>(null)
   const attachMenuRef = useRef<HTMLDivElement>(null)
   const plusBtnRef = useRef<HTMLButtonElement>(null)
 

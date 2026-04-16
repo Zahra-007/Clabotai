@@ -48,9 +48,45 @@ export default function Home() {
   const [activeChatId, setActiveChatId] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isLoaded, setIsLoaded] = useState(false)
+
   // Ref to always have the latest chats without stale closures
   const chatsRef = useRef<Chat[]>([])
   useEffect(() => { chatsRef.current = chats }, [chats])
+
+  // Load from localStorage on mount
+  useEffect(() => {
+    const savedChats = localStorage.getItem('clabot_chats')
+    const savedActiveId = localStorage.getItem('clabot_active_chat_id')
+    
+    if (savedChats) {
+      try {
+        const parsed = JSON.parse(savedChats)
+        if (Array.isArray(parsed)) {
+          setChats(parsed)
+        }
+      } catch (e) {
+        console.error('Failed to parse chats from localStorage', e)
+      }
+    }
+    
+    if (savedActiveId) {
+      setActiveChatId(savedActiveId)
+    }
+    setIsLoaded(true)
+  }, [])
+
+  // Save to localStorage on changes
+  useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem('clabot_chats', JSON.stringify(chats))
+      if (activeChatId) {
+        localStorage.setItem('clabot_active_chat_id', activeChatId)
+      } else {
+        localStorage.removeItem('clabot_active_chat_id')
+      }
+    }
+  }, [chats, activeChatId, isLoaded])
 
   const activeChat = chats.find(c => c.id === activeChatId)
 
