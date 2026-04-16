@@ -236,7 +236,11 @@ function renderInline(text: string): React.ReactNode {
 
   return parts.map((part, i) => {
     if (part.startsWith('**') && part.endsWith('**')) {
-      return <strong key={i}>{part.slice(2, -2)}</strong>
+      const innerText = part.slice(2, -2)
+      if (innerText.length <= 45) {
+        return <strong key={i}>{innerText}</strong>
+      }
+      return <span key={i}>{innerText}</span>
     }
     if (part.startsWith('*') && part.endsWith('*')) {
       return <em key={i}>{part.slice(1, -1)}</em>

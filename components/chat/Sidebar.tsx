@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { createPortal } from 'react-dom'
-import { SquarePen, MessageSquare, PanelLeft, Settings, LogIn, LogOut, Trash2, X, Eye, EyeOff, Star, Pencil, MoreHorizontal, ChevronDown } from 'lucide-react'
+import { SquarePen, MessageSquare, PanelLeft, Settings, LogIn, LogOut, Trash2, X, Eye, EyeOff, Star, Pencil, MoreHorizontal, ChevronDown, ChevronRight } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
@@ -36,7 +36,7 @@ function groupChatsByDate(chats: Chat[]) {
   const weekAgo = new Date(today); weekAgo.setDate(today.getDate() - 7)
 
   const groups: { label: string; chats: Chat[] }[] = [
-    { label: 'Today', chats: [] },
+    { label: 'Recents', chats: [] },
     { label: 'Yesterday', chats: [] },
     { label: 'Last 7 days', chats: [] },
     { label: 'Older', chats: [] },
@@ -249,7 +249,20 @@ export function Sidebar({
   const [renameValue, setRenameValue] = useState('')
   const [starredIds, setStarredIds] = useState<Set<string>>(new Set())
   const [user, setUser] = useState<{ name: string; email: string } | null>(null)
-  const grouped = groupChatsByDate(chats)
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set())
+  const grouped = groupChatsByDate(chats).map(g => ({
+    ...g,
+    label: g.label === 'Today' ? 'Recents' : g.label
+  }))
+
+  const toggleGroup = (label: string) => {
+    setCollapsedGroups(prev => {
+      const next = new Set(prev)
+      if (next.has(label)) next.delete(label)
+      else next.add(label)
+      return next
+    })
+  }
 
   // Close menu on outside click
   React.useEffect(() => {
@@ -306,23 +319,33 @@ export function Sidebar({
             No conversations yet
           </p>
         ) : (
-          grouped.map(group => (
+          grouped.map(group => {
+            const isCollapsed = collapsedGroups.has(group.label)
+            return (
             <div key={group.label}>
-              <div className="flex items-center gap-1 px-3 mb-1 mt-3">
-                <p className="text-[12px]" style={{ color: 'var(--color-text-muted)' }}>
+              <button 
+                onClick={() => toggleGroup(group.label)}
+                className="flex items-center gap-1 px-3 mb-1 mt-3 w-full text-left hover:opacity-80 transition-opacity"
+              >
+                <p className="text-[12px] font-medium" style={{ color: 'var(--color-text-muted)' }}>
                   {group.label}
                 </p>
-                <ChevronDown size={12} style={{ color: 'var(--color-text-muted)' }} />
-              </div>
-              <AnimatePresence mode="popLayout">
-                {group.chats.map(chat => (
+                {isCollapsed ? (
+                  <ChevronRight size={12} style={{ color: 'var(--color-text-muted)' }} />
+                ) : (
+                  <ChevronDown size={12} style={{ color: 'var(--color-text-muted)' }} />
+                )}
+              </button>
+              <AnimatePresence mode="popLayout" initial={false}>
+                {!isCollapsed && group.chats.map(chat => (
                   <motion.div
                     key={chat.id}
                     layout
-                    initial={{ opacity: 0, x: -4 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -4 }}
-                    className="relative group/chat-item"
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="relative group/chat-item overflow-hidden"
                     onMouseEnter={() => setHoveredChat(chat.id)}
                     onMouseLeave={() => setHoveredChat(null)}
                   >
@@ -453,7 +476,8 @@ export function Sidebar({
                 )
               }
             </div>
-          ))
+            )
+          })
         )}
       </div>
 
