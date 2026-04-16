@@ -80,6 +80,24 @@ export function ChatInput({ onSendMessage, isLoading }: ChatInputProps) {
     }
   }
 
+  const handlePaste = (e: React.ClipboardEvent) => {
+    const items = e.clipboardData?.items
+    if (!items) return
+    for (const item of Array.from(items)) {
+      if (item.type.startsWith('image/')) {
+        e.preventDefault()
+        const file = item.getAsFile()
+        if (file) {
+          setSelectedImage(file)
+          const reader = new FileReader()
+          reader.onloadend = () => setImagePreview(reader.result as string)
+          reader.readAsDataURL(file)
+        }
+        return
+      }
+    }
+  }
+
   const startRecording = useCallback(() => {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition
     if (!SR) return
@@ -214,6 +232,7 @@ export function ChatInput({ onSendMessage, isLoading }: ChatInputProps) {
             value={displayValue}
             onChange={e => !isRecording && setInput(e.target.value)}
             onKeyDown={handleKeyDown}
+            onPaste={handlePaste}
             placeholder="Message Clabot..."
             rows={1}
             readOnly={isRecording}
