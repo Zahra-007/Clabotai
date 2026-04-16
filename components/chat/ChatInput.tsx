@@ -109,7 +109,7 @@ export function ChatInput({ onSendMessage, isLoading }: ChatInputProps) {
 
     recognition.onstart = () => { setIsRecording(true); setTranscript('') }
 
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
+    recognition.onresult = (event: any) => {
       let interim = ''
       let final = ''
       for (let i = event.resultIndex; i < event.results.length; i++) {
