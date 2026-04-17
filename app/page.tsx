@@ -10,8 +10,8 @@ interface Message {
   role: 'user' | 'assistant'
   content: string
   timestamp?: number
-  imagePreview?: string | null   // shown in the user bubble
-  fileName?: string | null       // shown as a file badge in the user bubble
+  imagePreview?: string | null
+  fileName?: string | null
 }
 
 interface Chat {
@@ -21,7 +21,6 @@ interface Chat {
   createdAt: number
 }
 
-// File types we can extract text from
 const TEXT_EXTENSIONS = ['.txt', '.md', '.csv', '.json', '.py', '.js', '.ts', '.tsx', '.jsx', '.html', '.css', '.xml', '.yaml', '.yml', '.log', '.sh', '.env', '.config']
 const TEXT_MIME_TYPES = ['text/plain', 'text/csv', 'application/json', 'text/markdown', 'text/html', 'text/xml', 'text/javascript', 'application/javascript']
 
@@ -50,13 +49,12 @@ export default function Home() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isLoaded, setIsLoaded] = useState(false)
 
-  // Ref to always have the latest chats without stale closures
   const chatsRef = useRef<Chat[]>([])
   useEffect(() => { chatsRef.current = chats }, [chats])
 
-  // Load from localStorage on mount
+  // ✅ Load chats from localStorage, restore active chat on refresh via sessionStorage
   useEffect(() => {
-    const savedChats = sessionStorage.getItem('clabot_chats')
+    const savedChats = localStorage.getItem('clabot_chats')
     const savedActiveId = sessionStorage.getItem('clabot_active_chat_id')
 
     if (savedChats) {
@@ -71,15 +69,19 @@ export default function Home() {
     }
 
     if (savedActiveId) {
-      setActiveChatId(savedActiveId)
+      setActiveChatId(savedActiveId) // ✅ restore on refresh
+    } else {
+      setActiveChatId(null) // ✅ fresh open → empty window
     }
+
     setIsLoaded(true)
   }, [])
 
-  // Save to localStorage on changes
+  // ✅ Save chats to localStorage, active chat ID to sessionStorage
   useEffect(() => {
     if (isLoaded) {
-      sessionStorage.setItem('clabot_chats', JSON.stringify(chats))
+      localStorage.setItem('clabot_chats', JSON.stringify(chats))
+
       if (activeChatId) {
         sessionStorage.setItem('clabot_active_chat_id', activeChatId)
       } else {
@@ -112,14 +114,12 @@ export default function Home() {
   }
 
   const sendMessage = async (inputText: string, imageFile?: File | null, docFile?: File | null) => {
-    // Image-only → smart auto prompt: tell the model to analyze it proactively
     const displayText = inputText.trim()
-    const autoAnalyze = !displayText && !!imageFile  // user sent image with no text
+    const autoAnalyze = !displayText && !!imageFile
 
     if (!displayText && !imageFile && !docFile) return
     if (loading) return
 
-    // Read image as base64
     let base64Image: string | null = null
     if (imageFile) {
       base64Image = await new Promise<string>((resolve) => {
@@ -129,7 +129,6 @@ export default function Home() {
       })
     }
 
-    // Read file: text files → extract text content, others → base64
     let fileContent: string | null = null
     let fileName: string | null = null
     let fileIsText = false
@@ -137,7 +136,6 @@ export default function Home() {
       fileName = docFile.name
 
       if (isPdf(docFile)) {
-        // PDF — send to server for text extraction
         try {
           const b64 = await new Promise<string>((resolve) => {
             const reader = new FileReader()
@@ -169,7 +167,6 @@ export default function Home() {
           fileContent = null
         }
       } else {
-        // Non-text file: base64 for potential future handling
         fileContent = await new Promise<string>((resolve) => {
           const reader = new FileReader()
           reader.onloadend = () => resolve(reader.result as string)
@@ -192,7 +189,6 @@ export default function Home() {
       chatId = newChat.id
     }
 
-    // Build display message — include image preview and file name so bubble renders them
     const userMessage: Message = {
       role: 'user',
       content: displayText,
@@ -215,13 +211,10 @@ export default function Home() {
     ))
 
     try {
-      // Use ref to get latest messages without stale closure
       const currentChat = chatsRef.current.find(c => c.id === chatId)
       const previousMessages = currentChat?.messages.filter(m => m.role !== 'assistant' || m.content !== '') || []
-      // Build API messages: only role+content (strip UI-only fields)
       const lastMsg = previousMessages[previousMessages.length - 1]
       const alreadyAdded = lastMsg?.role === 'user' && lastMsg?.content === userMessage.content
-      // For the API payload, if user sent image with no text, prompt the model to analyze
       const apiUserContent = autoAnalyze
         ? 'Please analyze this image in detail. Describe what you see, identify key elements, and provide any relevant insights.'
         : (displayText || (docFile ? `Please read and summarize the attached file: ${fileName}` : ''))
@@ -277,7 +270,6 @@ export default function Home() {
       }
     } catch (error: any) {
       console.error('Error:', error)
-      // Show error in chat so user isn't left in silence
       setChats(prev => prev.map(c =>
         c.id === chatId
           ? {
